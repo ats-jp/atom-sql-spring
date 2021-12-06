@@ -16,6 +16,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import jp.ats.atomsql.AtomSql;
+import jp.ats.atomsql.Configure;
 import jp.ats.atomsql.Constants;
 import jp.ats.atomsql.Executors;
 import jp.ats.atomsql.Utils;
@@ -24,6 +25,7 @@ import jp.ats.atomsql.annotation.SqlProxy;
 /**
  * Atom SQLをSpringで使用できるように初期化するクラスです。<br>
  * {@link SqlProxy}が付与されたクラスを{@link Autowired}可能にします。<br>
+ * application.propertiesにプレフィックスatomsqlを付加することで各設定を記述することが可能です<br>
  * @see SpringApplication#addInitializers(ApplicationContextInitializer...)
  * @author 千葉 哲嗣
  */
@@ -45,12 +47,11 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 			bd.setPrimary(true);
 		};
 
-		context.registerBean(AtomSql.class.getName(), AtomSql.class, () -> new AtomSql(convert(context)), customizer);
+		context.registerBean(AtomSql.class.getName(), AtomSql.class, () -> new AtomSql(configure(context), executors(context)), customizer);
 
 		classes.forEach(c -> {
 			@SuppressWarnings("unchecked")
 			var casted = (Class<Object>) c;
-
 			context.registerBean(c.getName(), casted, () -> context.getBean(AtomSql.class).of(casted), customizer);
 		});
 	}
@@ -70,7 +71,18 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 		}
 	}
 
-	private static Executors convert(GenericApplicationContext context) {
+	private static Configure configure(GenericApplicationContext context) {
+		var environment = context.getEnvironment();
+		var enableLog = environment.getProperty("atomsql.enable-log", Boolean.class);
+
+		if (enableLog == null) return new Configure();
+
+		var logStackTracePattern = environment.getProperty("atomsql.log-stacktrace-pattern");
+
+		return new Configure(enableLog, logStackTracePattern);
+	}
+
+	private static Executors executors(GenericApplicationContext context) {
 		var map = context.getBeansOfType(JdbcTemplate.class);
 		var primary = context.getBean(JdbcTemplate.class);
 
