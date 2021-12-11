@@ -5,7 +5,7 @@
 	<groupId>jp.ats</groupId>
 	<artifactId>atom-sql-spring</artifactId>
 	<version>0.2.6</version>
-	<name>Atom SQL</name>
+	<name>Atom SQL Spring</name>
 	<description>An AtomSQL Implementation using Spring JdbcTemplate</description>
 
 	<url>https://github.com/ats-jp/atom-sql-spring</url>
