@@ -62,7 +62,7 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 
 			return Arrays.stream(new String(Utils.readBytes(proxyList), Constants.CHARSET).split("\\s+")).map(l -> {
 				try {
-					return Class.forName(l);
+					return Class.forName(l, false, Thread.currentThread().getContextClassLoader());
 				} catch (ClassNotFoundException e) {
 					//コンパイラの動作によっては削除されたクラスがまだ残っているかもしれないのでスキップ
 					return null;
