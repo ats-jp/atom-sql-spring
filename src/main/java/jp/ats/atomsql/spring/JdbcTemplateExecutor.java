@@ -78,9 +78,9 @@ class JdbcTemplateExecutor implements Executor {
 	}
 
 	@Override
-	public void logSql(Log log, String originalSql, String sql, boolean insecure, PreparedStatement ps) {
-		if (insecure) {
-			log.info(originalSql);
+	public void logSql(Log log, String originalSql, String sql, boolean confidential, PreparedStatement ps) {
+		if (confidential) {
+			log.info(CONFIDENTIAL + " " + originalSql);
 		} else {
 			log.info(ps.toString());
 		}

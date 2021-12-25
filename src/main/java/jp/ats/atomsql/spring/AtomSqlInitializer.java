@@ -5,6 +5,7 @@ import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import jp.ats.atomsql.AtomSql;
 import jp.ats.atomsql.Configure;
 import jp.ats.atomsql.Constants;
 import jp.ats.atomsql.Executors;
+import jp.ats.atomsql.PropertiesConfigure;
+import jp.ats.atomsql.SimpleConfigure;
 import jp.ats.atomsql.Utils;
 import jp.ats.atomsql.annotation.SqlProxy;
 
@@ -75,11 +78,11 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 		var environment = context.getEnvironment();
 		var enableLog = environment.getProperty("atomsql.enable-log", Boolean.class);
 
-		if (enableLog == null) return new Configure();
+		if (enableLog == null) return new PropertiesConfigure();
 
 		var logStackTracePattern = environment.getProperty("atomsql.log-stacktrace-pattern");
 
-		return new Configure(enableLog, logStackTracePattern);
+		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern));
 	}
 
 	private static Executors executors(GenericApplicationContext context) {
