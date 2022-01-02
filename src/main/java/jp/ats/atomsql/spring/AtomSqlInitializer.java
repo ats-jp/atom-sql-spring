@@ -2,11 +2,8 @@ package jp.ats.atomsql.spring;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -18,7 +15,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import jp.ats.atomsql.AtomSql;
 import jp.ats.atomsql.Configure;
-import jp.ats.atomsql.Constants;
 import jp.ats.atomsql.Executors;
 import jp.ats.atomsql.PropertiesConfigure;
 import jp.ats.atomsql.SimpleConfigure;
@@ -38,7 +34,7 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 	public void initialize(GenericApplicationContext context) {
 		List<Class<?>> classes;
 		try {
-			classes = loadProxyClasses();
+			classes = Utils.loadProxyClasses();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -57,21 +53,6 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 			var casted = (Class<Object>) c;
 			context.registerBean(casted, () -> context.getBean(AtomSql.class).of(casted), customizer);
 		});
-	}
-
-	private static List<Class<?>> loadProxyClasses() throws IOException {
-		try (var proxyList = AtomSqlInitializer.class.getClassLoader().getResourceAsStream(Constants.PROXY_LIST)) {
-			if (proxyList == null) return Collections.emptyList();
-
-			return Arrays.stream(new String(Utils.readBytes(proxyList), Constants.CHARSET).split("\\s+")).map(l -> {
-				try {
-					return Class.forName(l, false, Thread.currentThread().getContextClassLoader());
-				} catch (ClassNotFoundException e) {
-					//コンパイラの動作によっては削除されたクラスがまだ残っているかもしれないのでスキップ
-					return null;
-				}
-			}).filter(c -> c != null).collect(Collectors.toList());
-		}
 	}
 
 	private static Configure configure(GenericApplicationContext context) {
