@@ -1,14 +1,21 @@
 package jp.ats.atomsql.spring;
 
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import jp.ats.atomsql.AtomSqlException;
 import jp.ats.atomsql.BatchPreparedStatementSetter;
+import jp.ats.atomsql.ConnectionProxy;
 import jp.ats.atomsql.Constants;
 import jp.ats.atomsql.Executor;
 import jp.ats.atomsql.PreparedStatementSetter;
@@ -84,5 +91,37 @@ class JdbcTemplateExecutor implements Executor {
 		} else {
 			log.info(ps.toString());
 		}
+	}
+
+	@Override
+	public void bollowConnection(Consumer<ConnectionProxy> consumer) {
+		jdbcTemplate.execute(new ConnectionCallback<Object>() {
+
+			@Override
+			public Object doInConnection(Connection con) {
+				consumer.accept(new ConnectionProxy() {
+
+					@Override
+					public Blob createBlob() {
+						try {
+							return con.createBlob();
+						} catch (SQLException e) {
+							throw new AtomSqlException(e);
+						}
+					}
+
+					@Override
+					public Clob createClob() {
+						try {
+							return con.createClob();
+						} catch (SQLException e) {
+							throw new AtomSqlException(e);
+						}
+					}
+				});
+
+				return null;
+			}
+		});
 	}
 }
