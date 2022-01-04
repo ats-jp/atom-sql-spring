@@ -95,6 +95,7 @@ class JdbcTemplateExecutor implements Executor {
 
 	@Override
 	public void bollowConnection(Consumer<ConnectionProxy> consumer) {
+		//execute(StatementCallback<T>)と区別がつかないのでラムダで記述できない
 		jdbcTemplate.execute(new ConnectionCallback<Object>() {
 
 			@Override
