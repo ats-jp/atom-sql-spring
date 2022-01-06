@@ -1,7 +1,5 @@
 package jp.ats.atomsql.spring;
 
-import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -13,13 +11,13 @@ import org.apache.commons.logging.Log;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import jp.ats.atomsql.AtomSqlException;
 import jp.ats.atomsql.BatchPreparedStatementSetter;
 import jp.ats.atomsql.ConnectionProxy;
 import jp.ats.atomsql.Constants;
 import jp.ats.atomsql.Executor;
 import jp.ats.atomsql.PreparedStatementSetter;
 import jp.ats.atomsql.RowMapper;
+import jp.ats.atomsql.SimpleConnectionProxy;
 
 /**
  * @author 千葉 哲嗣
@@ -85,12 +83,8 @@ class JdbcTemplateExecutor implements Executor {
 	}
 
 	@Override
-	public void logSql(Log log, String originalSql, String sql, boolean confidential, PreparedStatement ps) {
-		if (confidential) {
-			log.info(CONFIDENTIAL + " " + originalSql);
-		} else {
-			log.info(ps.toString());
-		}
+	public void logSql(Log log, String originalSql, String sql, PreparedStatement ps) {
+		log.info("sql:" + Constants.NEW_LINE + ps.toString());
 	}
 
 	@Override
@@ -100,26 +94,7 @@ class JdbcTemplateExecutor implements Executor {
 
 			@Override
 			public Object doInConnection(Connection con) {
-				consumer.accept(new ConnectionProxy() {
-
-					@Override
-					public Blob createBlob() {
-						try {
-							return con.createBlob();
-						} catch (SQLException e) {
-							throw new AtomSqlException(e);
-						}
-					}
-
-					@Override
-					public Clob createClob() {
-						try {
-							return con.createClob();
-						} catch (SQLException e) {
-							throw new AtomSqlException(e);
-						}
-					}
-				});
+				consumer.accept(new SimpleConnectionProxy(con));
 
 				return null;
 			}
