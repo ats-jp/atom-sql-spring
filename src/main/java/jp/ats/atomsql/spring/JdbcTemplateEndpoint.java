@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import jp.ats.atomsql.BatchPreparedStatementSetter;
 import jp.ats.atomsql.ConnectionProxy;
 import jp.ats.atomsql.Constants;
-import jp.ats.atomsql.Executor;
+import jp.ats.atomsql.Endpoint;
 import jp.ats.atomsql.PreparedStatementSetter;
 import jp.ats.atomsql.RowMapper;
 import jp.ats.atomsql.SimpleConnectionProxy;
@@ -22,14 +22,14 @@ import jp.ats.atomsql.SimpleConnectionProxy;
 /**
  * @author 千葉 哲嗣
  */
-class JdbcTemplateExecutor implements Executor {
+class JdbcTemplateEndpoint implements Endpoint {
 
 	private final JdbcTemplate jdbcTemplate;
 
 	/**
 	 * @param jdbcTemplate
 	 */
-	public JdbcTemplateExecutor(JdbcTemplate jdbcTemplate) {
+	public JdbcTemplateEndpoint(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = Objects.requireNonNull(jdbcTemplate);
 	}
 

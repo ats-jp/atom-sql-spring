@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import jp.ats.atomsql.AtomSql;
 import jp.ats.atomsql.Configure;
-import jp.ats.atomsql.Executors;
+import jp.ats.atomsql.Endpoints;
 import jp.ats.atomsql.PropertiesConfigure;
 import jp.ats.atomsql.SimpleConfigure;
 import jp.ats.atomsql.Utils;
@@ -46,7 +46,7 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 			bd.setPrimary(true);
 		};
 
-		context.registerBean(AtomSql.class, () -> new AtomSql(configure(context), executors(context)), customizer);
+		context.registerBean(AtomSql.class, () -> new AtomSql(configure(context), endpoints(context)), customizer);
 
 		classes.forEach(c -> {
 			@SuppressWarnings("unchecked")
@@ -66,19 +66,19 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern));
 	}
 
-	private static Executors executors(GenericApplicationContext context) {
+	private static Endpoints endpoints(GenericApplicationContext context) {
 		var map = context.getBeansOfType(JdbcTemplate.class);
 		var primary = context.getBean(JdbcTemplate.class);
 
 		if (map.size() == 1) {
-			return new Executors(new JdbcTemplateExecutor(primary));
+			return new Endpoints(new JdbcTemplateEndpoint(primary));
 		}
 
 		var entries = map.entrySet().stream().map(e -> {
 			var jdbcTemplate = e.getValue();
-			return new Executors.Entry(e.getKey(), new JdbcTemplateExecutor(jdbcTemplate), jdbcTemplate == primary);
-		}).toArray(Executors.Entry[]::new);
+			return new Endpoints.Entry(e.getKey(), new JdbcTemplateEndpoint(jdbcTemplate), jdbcTemplate == primary);
+		}).toArray(Endpoints.Entry[]::new);
 
-		return new Executors(entries);
+		return new Endpoints(entries);
 	}
 }
