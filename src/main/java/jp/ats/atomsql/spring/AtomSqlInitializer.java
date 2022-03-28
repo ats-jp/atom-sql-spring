@@ -14,11 +14,11 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import jp.ats.atomsql.AtomSql;
+import jp.ats.atomsql.AtomSqlUtils;
 import jp.ats.atomsql.Configure;
 import jp.ats.atomsql.Endpoints;
 import jp.ats.atomsql.PropertiesConfigure;
 import jp.ats.atomsql.SimpleConfigure;
-import jp.ats.atomsql.Utils;
 import jp.ats.atomsql.annotation.SqlProxy;
 
 /**
@@ -34,7 +34,7 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 	public void initialize(GenericApplicationContext context) {
 		List<Class<?>> classes;
 		try {
-			classes = Utils.loadProxyClasses();
+			classes = AtomSqlUtils.loadProxyClasses();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
