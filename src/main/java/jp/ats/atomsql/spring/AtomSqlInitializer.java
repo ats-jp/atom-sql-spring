@@ -63,7 +63,9 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 
 		var logStackTracePattern = environment.getProperty("atomsql.log-stacktrace-pattern");
 
-		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern));
+		var useQualifier = environment.getProperty("atomsql.use-qualifier", Boolean.class);
+
+		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern), useQualifier);
 	}
 
 	private static Endpoints endpoints(GenericApplicationContext context) {
