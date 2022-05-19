@@ -3,6 +3,7 @@ package jp.ats.atomsql.spring;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import jp.ats.atomsql.AtomSql;
+import jp.ats.atomsql.AtomSqlTypeFactory;
 import jp.ats.atomsql.AtomSqlUtils;
 import jp.ats.atomsql.Configure;
 import jp.ats.atomsql.Endpoints;
@@ -32,6 +34,8 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 
 	@Override
 	public void initialize(GenericApplicationContext context) {
+		AtomSql.initialize(configure(context));
+
 		List<Class<?>> classes;
 		try {
 			classes = AtomSqlUtils.loadProxyClasses();
@@ -46,7 +50,7 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 			bd.setPrimary(true);
 		};
 
-		context.registerBean(AtomSql.class, () -> new AtomSql(configure(context), endpoints(context)), customizer);
+		context.registerBean(AtomSql.class, () -> new AtomSql(endpoints(context)), customizer);
 
 		classes.forEach(c -> {
 			@SuppressWarnings("unchecked")
@@ -65,7 +69,17 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 
 		var useQualifier = environment.getProperty("atomsql.use-qualifier", Boolean.class);
 
-		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern), useQualifier);
+		AtomSqlTypeFactory typeFactory = null;
+		var typeFactoryClass = environment.getProperty("atomsql.type-factory-class");
+		if (typeFactoryClass != null) {
+			try {
+				typeFactory = (AtomSqlTypeFactory) Class.forName(typeFactoryClass).getConstructor().newInstance();
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern), useQualifier, Optional.ofNullable(typeFactory));
 	}
 
 	private static Endpoints endpoints(GenericApplicationContext context) {
