@@ -71,13 +71,8 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 
 		AtomSqlTypeFactory typeFactory = null;
 		var typeFactoryClass = environment.getProperty("atomsql.type-factory-class");
-		if (typeFactoryClass != null) {
-			try {
-				typeFactory = (AtomSqlTypeFactory) Class.forName(typeFactoryClass).getConstructor().newInstance();
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-		}
+		if (typeFactoryClass != null)
+			typeFactory = AtomSqlTypeFactory.newInstance(typeFactoryClass);
 
 		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern), useQualifier, Optional.ofNullable(typeFactory));
 	}
