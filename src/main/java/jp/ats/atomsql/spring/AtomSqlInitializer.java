@@ -34,7 +34,7 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 
 	@Override
 	public void initialize(GenericApplicationContext context) {
-		AtomSql.initialize(configure(context));
+		AtomSql.initializeIfUninitialized(configure(context));
 
 		List<Class<?>> classes;
 		try {
@@ -65,7 +65,7 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 
 		if (enableLog == null) return new PropertiesConfigure();
 
-		var logStackTracePattern = environment.getProperty("atomsql.log-stacktrace-pattern");
+		var logStackTracePattern = environment.getProperty("atomsql.log-stacktrace-pattern", ".+");
 
 		var useQualifier = environment.getProperty("atomsql.use-qualifier", Boolean.class);
 
