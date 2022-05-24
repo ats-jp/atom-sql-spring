@@ -3,7 +3,6 @@ package jp.ats.atomsql.spring;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import jp.ats.atomsql.AtomSql;
-import jp.ats.atomsql.AtomSqlTypeFactory;
 import jp.ats.atomsql.AtomSqlUtils;
 import jp.ats.atomsql.Configure;
 import jp.ats.atomsql.Endpoints;
@@ -69,12 +67,9 @@ public class AtomSqlInitializer implements ApplicationContextInitializer<Generic
 
 		var useQualifier = environment.getProperty("atomsql.use-qualifier", Boolean.class);
 
-		AtomSqlTypeFactory typeFactory = null;
 		var typeFactoryClass = environment.getProperty("atomsql.type-factory-class");
-		if (typeFactoryClass != null)
-			typeFactory = AtomSqlTypeFactory.newInstance(typeFactoryClass);
 
-		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern), useQualifier, Optional.ofNullable(typeFactory));
+		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern), useQualifier, typeFactoryClass);
 	}
 
 	private static Endpoints endpoints(GenericApplicationContext context) {
