@@ -28,7 +28,7 @@ import jp.ats.atomsql.annotation.SqlProxy;
  * @see SpringApplication#addInitializers(ApplicationContextInitializer...)
  * @author 千葉 哲嗣
  */
-public class AtomSqlInitializer implements ApplicationContextInitializer<GenericApplicationContext> {
+public class AtomSqlContextInitializer implements ApplicationContextInitializer<GenericApplicationContext> {
 
 	@Override
 	public void initialize(GenericApplicationContext context) {
