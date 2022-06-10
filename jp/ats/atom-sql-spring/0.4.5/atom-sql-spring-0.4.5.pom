@@ -8,6 +8,13 @@
 
 	<url>https://github.com/ats-jp/atom-sql-spring</url>
 
+	<repositories>
+		<repository>
+			<id>atom-sql</id>
+			<url>https://ats-jp.github.io/atom-sql/</url>
+		</repository>
+	</repositories>
+
 	<distributionManagement>
 		<repository>
 			<id>internal.repos</id>
