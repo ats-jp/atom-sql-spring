@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import jp.ats.atomsql.AtomSql;
 import jp.ats.atomsql.AtomSqlUtils;
 import jp.ats.atomsql.Configure;
+import jp.ats.atomsql.DefaultAtomSqlTypeFactory;
 import jp.ats.atomsql.Endpoints;
 import jp.ats.atomsql.PropertiesConfigure;
 import jp.ats.atomsql.SimpleConfigure;
@@ -67,9 +68,16 @@ public class AtomSqlContextInitializer implements ApplicationContextInitializer<
 
 		var useQualifier = environment.getProperty("atomsql.use-qualifier", Boolean.class);
 
-		var typeFactoryClass = environment.getProperty("atomsql.type-factory-class");
+		var typeFactoryClass = environment.getProperty("atomsql.type-factory-class", DefaultAtomSqlTypeFactory.class.getName());
 
-		return new SimpleConfigure(enableLog, Pattern.compile(logStackTracePattern), useQualifier, typeFactoryClass);
+		var batchThreshold = environment.getProperty("atomsql.batch-threshold", Integer.class, 0);
+
+		return new SimpleConfigure(
+			enableLog,
+			Pattern.compile(logStackTracePattern),
+			useQualifier,
+			typeFactoryClass,
+			batchThreshold);
 	}
 
 	private static Endpoints endpoints(GenericApplicationContext context) {
