@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>jp.ats</groupId>
 	<artifactId>atom-sql-spring</artifactId>
-	<version>0.4.6</version>
+	<version>0.4.7</version>
 	<name>Atom SQL Spring</name>
 	<description>An AtomSQL Implementation using Spring JdbcTemplate</description>
 
