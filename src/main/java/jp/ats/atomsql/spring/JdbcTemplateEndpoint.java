@@ -1,6 +1,5 @@
 package jp.ats.atomsql.spring;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -35,13 +34,11 @@ class JdbcTemplateEndpoint implements Endpoint {
 
 	/**
 	 * @see JdbcTemplate#batchUpdate(String, org.springframework.jdbc.core.BatchPreparedStatementSetter)
-	 * @param sql
-	 * @param bpss
 	 */
 	@Override
-	public void batchUpdate(String sql, BatchPreparedStatementSetter bpss) {
+	public int[] batchUpdate(String sql, BatchPreparedStatementSetter bpss) {
 		// MySQLのPareparedStatement#toString()対策でSQLの先頭に改行を付与
-		jdbcTemplate.batchUpdate(Constants.NEW_LINE + sql, new org.springframework.jdbc.core.BatchPreparedStatementSetter() {
+		return jdbcTemplate.batchUpdate(Constants.NEW_LINE + sql, new org.springframework.jdbc.core.BatchPreparedStatementSetter() {
 
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -58,11 +55,6 @@ class JdbcTemplateEndpoint implements Endpoint {
 
 	/**
 	 * @see JdbcTemplate#queryForStream(String, org.springframework.jdbc.core.PreparedStatementSetter, org.springframework.jdbc.core.RowMapper)
-	 * @param <T>
-	 * @param sql
-	 * @param pss
-	 * @param rowMapper
-	 * @return {@link Stream}
 	 */
 	@Override
 	public <T> Stream<T> queryForStream(String sql, PreparedStatementSetter pss, RowMapper<T> rowMapper) {
@@ -72,9 +64,6 @@ class JdbcTemplateEndpoint implements Endpoint {
 
 	/**
 	 * @see JdbcTemplate#update(String, org.springframework.jdbc.core.PreparedStatementSetter)
-	 * @param sql
-	 * @param pss
-	 * @return int
 	 */
 	@Override
 	public int update(String sql, PreparedStatementSetter pss) {
@@ -89,15 +78,10 @@ class JdbcTemplateEndpoint implements Endpoint {
 
 	@Override
 	public void bollowConnection(Consumer<ConnectionProxy> consumer) {
-		//execute(StatementCallback<T>)と区別がつかないのでラムダで記述できない
-		jdbcTemplate.execute(new ConnectionCallback<Object>() {
+		jdbcTemplate.execute((ConnectionCallback<Object>) con -> {
+			consumer.accept(new SimpleConnectionProxy(con));
 
-			@Override
-			public Object doInConnection(Connection con) {
-				consumer.accept(new SimpleConnectionProxy(con));
-
-				return null;
-			}
+			return null;
 		});
 	}
 }
