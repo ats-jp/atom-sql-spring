@@ -18,7 +18,6 @@ import jp.ats.atomsql.AtomSqlUtils;
 import jp.ats.atomsql.Configure;
 import jp.ats.atomsql.DefaultAtomSqlTypeFactory;
 import jp.ats.atomsql.Endpoints;
-import jp.ats.atomsql.PropertiesConfigure;
 import jp.ats.atomsql.SimpleConfigure;
 import jp.ats.atomsql.annotation.SqlProxy;
 
@@ -60,13 +59,13 @@ public class AtomSqlContextInitializer implements ApplicationContextInitializer<
 
 	private static Configure configure(GenericApplicationContext context) {
 		var environment = context.getEnvironment();
-		var enableLog = environment.getProperty("atomsql.enable-log", Boolean.class);
-
-		if (enableLog == null) return new PropertiesConfigure();
+		var enableLog = environment.getProperty("atomsql.enable-log", Boolean.class, false);
 
 		var logStackTracePattern = environment.getProperty("atomsql.log-stacktrace-pattern", ".+");
 
-		var useQualifier = environment.getProperty("atomsql.use-qualifier", Boolean.class);
+		var ignoreNoSqlLog = environment.getProperty("atomsql.ignore-no-sql-log", Boolean.class, false);
+
+		var useQualifier = environment.getProperty("atomsql.use-qualifier", Boolean.class, false);
 
 		var typeFactoryClass = environment.getProperty("atomsql.type-factory-class", DefaultAtomSqlTypeFactory.class.getName());
 
@@ -75,6 +74,7 @@ public class AtomSqlContextInitializer implements ApplicationContextInitializer<
 		return new SimpleConfigure(
 			enableLog,
 			Pattern.compile(logStackTracePattern),
+			ignoreNoSqlLog,
 			useQualifier,
 			typeFactoryClass,
 			batchThreshold);
