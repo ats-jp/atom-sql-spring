@@ -1,12 +1,13 @@
 package jp.ats.atomsql.spring;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import org.apache.commons.logging.Log;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -72,8 +73,8 @@ class JdbcTemplateEndpoint implements Endpoint {
 	}
 
 	@Override
-	public void logSql(Log log, String originalSql, String sql, PreparedStatement ps) {
-		log.info("sql:" + Constants.NEW_LINE + ps.toString());
+	public void logSql(Logger logger, String originalSql, String sql, PreparedStatement ps) {
+		logger.log(Level.INFO, "sql:" + Constants.NEW_LINE + ps.toString());
 	}
 
 	@Override
